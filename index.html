@@ -1,0 +1,666 @@
+# ============================================================
+# PORTFOLIO HTML GENERADO POR CÓDIGO
+# Análisis descriptivo de producción no convencional - YPF
+# ============================================================
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import base64
+from io import BytesIO
+from google.colab import drive, files
+
+# ─── 1. MONTAR DRIVE Y CARGAR DATOS ────────────────────────
+drive.mount('/content/drive')
+
+ruta = '/content/drive/MyDrive/PROBABILIDADyESTADISTICA/produccin-de-pozos-de-gas-y-petrleo-no-convencional.csv'
+df = pd.read_csv(ruta)
+
+print(f"Dataset cargado: {df.shape[0]:,} filas, {df.shape[1]} columnas")
+
+# ─── 2. ESTILO PROFESIONAL ─────────────────────────────────
+YPF_BLUE = '#003C71'
+YPF_BLUE_DARK = '#002A50'
+YPF_LIGHT = '#00A9E0'
+YPF_GRAY = '#475569'
+YPF_LIGHT_GRAY = '#E2E8F0'
+YPF_BG = '#FFFFFF'
+YPF_RED = '#E53E3E'
+
+sns.set_theme(style="white")
+plt.rcParams.update({
+    'figure.dpi': 150,
+    'savefig.dpi': 150,
+    'font.family': 'sans-serif',
+    'font.sans-serif': ['Arial', 'Helvetica', 'DejaVu Sans'],
+    'font.size': 11,
+    'axes.titlesize': 14,
+    'axes.titleweight': 'bold',
+    'axes.titlecolor': '#0F172A',
+    'axes.titlepad': 16,
+    'axes.labelsize': 11,
+    'axes.labelcolor': YPF_GRAY,
+    'axes.edgecolor': YPF_LIGHT_GRAY,
+    'axes.linewidth': 1,
+    'axes.spines.top': False,
+    'axes.spines.right': False,
+    'xtick.color': YPF_GRAY,
+    'ytick.color': YPF_GRAY,
+    'xtick.labelsize': 10,
+    'ytick.labelsize': 10,
+    'grid.color': YPF_LIGHT_GRAY,
+    'grid.linewidth': 0.5,
+    'legend.frameon': False,
+    'legend.fontsize': 10,
+    'figure.facecolor': YPF_BG,
+    'axes.facecolor': YPF_BG,
+})
+
+print("Estilo configurado")
+
+# ─── 3. FUNCIÓN BASE64 ─────────────────────────────────────
+def fig_to_base64(fig):
+    buf = BytesIO()
+    fig.savefig(buf, format='png', dpi=150, bbox_inches='tight',
+                facecolor=YPF_BG, edgecolor='none')
+    buf.seek(0)
+    img_b64 = base64.b64encode(buf.read()).decode('utf-8')
+    plt.close(fig)
+    return img_b64
+
+def img_tag(b64, alt=""):
+    return f'<img src="data:image/png;base64,{b64}" alt="{alt}">'
+
+# ─── 4. GRÁFICOS: PETRÓLEO ─────────────────────────────────
+col = 'prod_pet'
+pet = {}
+
+fig, ax = plt.subplots(figsize=(10, 5))
+sns.histplot(data=df, x=col, bins=60, color=YPF_LIGHT, edgecolor='white', linewidth=0.5, ax=ax)
+ax.axvline(df[col].mean(), color=YPF_BLUE, linestyle='--', linewidth=1.5, label=f'Media = {df[col].mean():.1f}')
+ax.axvline(df[col].median(), color=YPF_RED, linestyle='--', linewidth=1.5, label=f'Mediana = {df[col].median():.1f}')
+ax.set_xlabel('Producción de petróleo (m³)')
+ax.set_ylabel('Frecuencia')
+ax.set_title('Distribución de producción de petróleo')
+ax.legend()
+pet['hist_todos'] = fig_to_base64(fig)
+
+df_pos = df[df[col] > 0]
+fig, ax = plt.subplots(figsize=(10, 5))
+sns.histplot(data=df_pos, x=col, bins=60, color=YPF_LIGHT, edgecolor='white', linewidth=0.5, ax=ax)
+ax.axvline(df_pos[col].mean(), color=YPF_BLUE, linestyle='--', linewidth=1.5, label=f'Media = {df_pos[col].mean():.1f}')
+ax.axvline(df_pos[col].median(), color=YPF_RED, linestyle='--', linewidth=1.5, label=f'Mediana = {df_pos[col].median():.1f}')
+ax.set_xlabel('Producción de petróleo (m³)')
+ax.set_ylabel('Frecuencia')
+ax.set_title('Distribución de producción de petróleo · Solo pozos con producción > 0')
+ax.legend()
+pet['hist_pos'] = fig_to_base64(fig)
+
+fig, ax = plt.subplots(figsize=(10, 5))
+sns.histplot(data=df_pos, x=col, bins=60, color=YPF_LIGHT, edgecolor='white', linewidth=0.5, ax=ax)
+ax.set_yscale('log')
+ax.set_xlim(0, 26000)
+ax.set_xlabel('Producción de petróleo (m³)')
+ax.set_ylabel('Frecuencia (escala log)')
+ax.set_title('Distribución de producción de petróleo · Escala logarítmica')
+pet['hist_log'] = fig_to_base64(fig)
+
+fig, ax = plt.subplots(figsize=(10, 4))
+sns.boxplot(data=df, x=col, color=YPF_LIGHT, showfliers=False, ax=ax, width=0.5)
+ax.set_xlabel('Producción de petróleo (m³)')
+ax.set_title('Boxplot de producción de petróleo · Sin valores atípicos')
+pet['box_sin'] = fig_to_base64(fig)
+
+fig, ax = plt.subplots(figsize=(10, 4))
+sns.boxplot(data=df, x=col, color=YPF_LIGHT, ax=ax, width=0.5)
+ax.set_xlabel('Producción de petróleo (m³)')
+ax.set_title('Boxplot de producción de petróleo · Con valores atípicos')
+pet['box_con'] = fig_to_base64(fig)
+
+print(f"Petróleo: {len(pet)} gráficos")
+
+# ─── 5. GRÁFICOS: GAS ──────────────────────────────────────
+col = 'prod_gas'
+gas = {}
+
+fig, ax = plt.subplots(figsize=(10, 5))
+sns.histplot(data=df, x=col, bins=60, color=YPF_LIGHT, edgecolor='white', linewidth=0.5, ax=ax)
+ax.axvline(df[col].mean(), color=YPF_BLUE, linestyle='--', linewidth=1.5, label=f'Media = {df[col].mean():.1f}')
+ax.axvline(df[col].median(), color=YPF_RED, linestyle='--', linewidth=1.5, label=f'Mediana = {df[col].median():.1f}')
+ax.set_xlabel('Producción de gas (miles de m³)')
+ax.set_ylabel('Frecuencia')
+ax.set_title('Distribución de producción de gas')
+ax.legend()
+gas['hist'] = fig_to_base64(fig)
+
+fig, ax = plt.subplots(figsize=(10, 5))
+sns.histplot(data=df, x=col, bins=60, color=YPF_LIGHT, edgecolor='white', linewidth=0.5, ax=ax)
+ax.set_yscale('log')
+ax.set_xlim(0, 5000)
+ax.set_xlabel('Producción de gas (miles de m³)')
+ax.set_ylabel('Frecuencia (escala log)')
+ax.set_title('Distribución de producción de gas · Escala logarítmica')
+gas['hist_log'] = fig_to_base64(fig)
+
+fig, ax = plt.subplots(figsize=(10, 4))
+sns.boxplot(data=df, x=col, color=YPF_LIGHT, showfliers=False, ax=ax, width=0.5)
+ax.set_xlabel('Producción de gas (miles de m³)')
+ax.set_title('Boxplot de producción de gas')
+gas['box'] = fig_to_base64(fig)
+
+print(f"Gas: {len(gas)} gráficos")
+
+# ─── 6. GRÁFICOS: AGUA ─────────────────────────────────────
+col = 'prod_agua'
+agua = {}
+
+fig, ax = plt.subplots(figsize=(10, 5))
+sns.histplot(data=df, x=col, bins=60, color=YPF_LIGHT, edgecolor='white', linewidth=0.5, ax=ax)
+ax.axvline(df[col].mean(), color=YPF_BLUE, linestyle='--', linewidth=1.5, label=f'Media = {df[col].mean():.1f}')
+ax.axvline(df[col].median(), color=YPF_RED, linestyle='--', linewidth=1.5, label=f'Mediana = {df[col].median():.1f}')
+ax.set_xlabel('Producción de agua (m³)')
+ax.set_ylabel('Frecuencia')
+ax.set_title('Distribución de producción de agua')
+ax.legend()
+agua['hist'] = fig_to_base64(fig)
+
+fig, ax = plt.subplots(figsize=(10, 5))
+sns.histplot(data=df, x=col, bins=60, color=YPF_LIGHT, edgecolor='white', linewidth=0.5, ax=ax)
+ax.set_yscale('log')
+ax.set_xlim(0, 40000)
+ax.set_xlabel('Producción de agua (m³)')
+ax.set_ylabel('Frecuencia (escala log)')
+ax.set_title('Distribución de producción de agua · Escala logarítmica')
+agua['hist_log'] = fig_to_base64(fig)
+
+fig, ax = plt.subplots(figsize=(10, 4))
+sns.boxplot(data=df, x=col, color=YPF_LIGHT, showfliers=False, ax=ax, width=0.5)
+ax.set_xlabel('Producción de agua (m³)')
+ax.set_title('Boxplot de producción de agua · Sin valores atípicos')
+agua['box_sin'] = fig_to_base64(fig)
+
+fig, ax = plt.subplots(figsize=(10, 4))
+sns.boxplot(data=df, x=col, color=YPF_LIGHT, ax=ax, width=0.5)
+ax.set_xlabel('Producción de agua (m³)')
+ax.set_title('Boxplot de producción de agua · Con valores atípicos')
+agua['box_con'] = fig_to_base64(fig)
+
+print(f"Agua: {len(agua)} gráficos")
+
+# ─── 7. ARMAR EL HTML ──────────────────────────────────────
+html = f'''<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Análisis de Producción No Convencional · Veronica Celiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {{
+    --ypf-blue: #003C71;
+    --ypf-blue-dark: #002A50;
+    --ypf-light: #00A9E0;
+    --bg: #FFFFFF;
+    --bg-soft: #F7F9FB;
+    --border: #E2E8F0;
+    --text: #0F172A;
+    --text-muted: #475569;
+    --text-soft: #94A3B8;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }}
+  * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+  html {{ scroll-behavior: smooth; }}
+  body {{
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }}
+  code {{
+    font-family: 'JetBrains Mono', Consolas, monospace;
+    background: var(--bg-soft);
+    color: var(--ypf-blue);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.88em;
+  }}
+  a {{ color: var(--ypf-blue); text-decoration: none; }}
+  a:hover {{ text-decoration: underline; }}
+  header {{
+    position: sticky;
+    top: 0;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+  }}
+  .nav {{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }}
+  .nav-brand {{ font-weight: 600; font-size: 0.95rem; letter-spacing: -0.01em; }}
+  .nav-links {{ display: flex; gap: 24px; font-size: 0.9rem; }}
+  .nav-links a {{ color: var(--text-muted); transition: color 0.15s; }}
+  .nav-links a:hover {{ color: var(--ypf-blue); text-decoration: none; }}
+  @media (max-width: 720px) {{ .nav-links {{ display: none; }} }}
+  main {{ max-width: 1100px; margin: 0 auto; padding: 0 24px; }}
+  section {{ padding: 72px 0; border-bottom: 1px solid var(--border); }}
+  section:last-child {{ border-bottom: none; }}
+  .hero {{ padding: 88px 0 64px; text-align: center; }}
+  .hero-eyebrow {{
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--ypf-blue);
+    background: rgba(0, 60, 113, 0.08);
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }}
+  .hero h1 {{
+    font-size: 2.6rem;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    margin-bottom: 20px;
+  }}
+  .hero p {{
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    max-width: 720px;
+    margin: 0 auto 32px;
+  }}
+  .hero-buttons {{ display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }}
+  .btn {{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 22px;
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+    cursor: pointer;
+  }}
+  .btn-primary {{ background: var(--ypf-blue); color: white; }}
+  .btn-primary:hover {{ background: var(--ypf-blue-dark); text-decoration: none; }}
+  .btn-outline {{ background: white; color: var(--text); border-color: var(--border); }}
+  .btn-outline:hover {{ border-color: var(--ypf-blue); color: var(--ypf-blue); text-decoration: none; }}
+  @media (max-width: 640px) {{
+    .hero {{ padding: 48px 0 40px; }}
+    .hero h1 {{ font-size: 1.9rem; }}
+    .hero p {{ font-size: 1rem; }}
+  }}
+  .stats {{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 56px 0;
+    border-bottom: 1px solid var(--border);
+  }}
+  @media (max-width: 768px) {{ .stats {{ grid-template-columns: 1fr; }} }}
+  .stat-card {{
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    transition: border-color 0.15s, transform 0.15s;
+  }}
+  .stat-card:hover {{ border-color: var(--ypf-light); transform: translateY(-2px); }}
+  .stat-label {{
+    font-size: 0.78rem;
+    color: var(--text-soft);
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }}
+  .stat-value {{
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--ypf-blue);
+    line-height: 1.1;
+    margin-bottom: 4px;
+    letter-spacing: -0.02em;
+  }}
+  .stat-unit {{ font-size: 0.9rem; color: var(--text-muted); font-weight: 500; }}
+  .section-header {{ margin-bottom: 40px; }}
+  .section-eyebrow {{
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--ypf-light);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }}
+  .section-title {{
+    font-size: 1.85rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }}
+  .section-desc {{ font-size: 1.02rem; color: var(--text-muted); max-width: 780px; }}
+  .charts-grid {{ display: grid; grid-template-columns: 1fr; gap: 24px; margin-bottom: 32px; }}
+  .chart-card {{
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    transition: border-color 0.15s;
+  }}
+  .chart-card:hover {{ border-color: var(--ypf-light); }}
+  .chart-card img {{ width: 100%; height: auto; border-radius: var(--radius-sm); display: block; }}
+  .measures {{
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 24px;
+  }}
+  .measures-title {{
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 20px;
+  }}
+  .measures-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; }}
+  .measure-item {{ border-left: 2px solid var(--ypf-light); padding-left: 16px; }}
+  .measure-label {{ font-size: 0.82rem; color: var(--text-soft); margin-bottom: 4px; font-weight: 500; }}
+  .measure-value {{ font-size: 1.2rem; font-weight: 600; letter-spacing: -0.01em; }}
+  .measure-unit {{ font-size: 0.78rem; color: var(--text-soft); font-weight: 400; }}
+  .interpretation {{
+    background: white;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--ypf-blue);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    font-size: 1rem;
+    color: var(--text-muted);
+    line-height: 1.75;
+  }}
+  .interpretation p + p {{ margin-top: 12px; }}
+  .interpretation strong {{ color: var(--text); font-weight: 600; }}
+  .comparison-table {{
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 0.94rem;
+    background: white;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }}
+  .comparison-table th {{
+    background: var(--bg-soft);
+    font-weight: 600;
+    text-align: left;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }}
+  .comparison-table td {{
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+  }}
+  .comparison-table tr:last-child td {{ border-bottom: none; }}
+  .comparison-table td:first-child {{ color: var(--text); font-weight: 500; }}
+  .comparison-table td strong {{ color: var(--ypf-blue); }}
+  .conclusion {{
+    background: linear-gradient(135deg, rgba(0, 60, 113, 0.03), rgba(0, 169, 224, 0.06));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 44px 36px;
+    text-align: center;
+  }}
+  .conclusion h3 {{
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--ypf-blue);
+    margin-bottom: 16px;
+    letter-spacing: -0.01em;
+  }}
+  .conclusion p {{ font-size: 1.02rem; color: var(--text-muted); max-width: 720px; margin: 0 auto 12px; }}
+  footer {{
+    background: var(--bg-soft);
+    border-top: 1px solid var(--border);
+    padding: 48px 24px;
+    text-align: center;
+  }}
+  .footer-content {{ max-width: 1100px; margin: 0 auto; }}
+  .footer-name {{ font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }}
+  .footer-role {{ font-size: 0.9rem; color: var(--text-soft); margin-bottom: 24px; }}
+  .footer-links {{ display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; font-size: 0.9rem; }}
+  .footer-links a {{ color: var(--text-muted); }}
+  .footer-links a:hover {{ color: var(--ypf-blue); text-decoration: none; }}
+  .footer-copy {{
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--text-soft);
+  }}
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <div class="nav-brand">Veronica Celiz</div>
+    <div class="nav-links">
+      <a href="#petroleo">Petróleo</a>
+      <a href="#gas">Gas</a>
+      <a href="#agua">Agua</a>
+      <a href="#comparacion">Comparación</a>
+      <a href="https://github.com/VeronicaCeliz7/analisis-petroleo-no-convencional-YPF" target="_blank">GitHub</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="hero-eyebrow">Análisis descriptivo · Vaca Muerta</div>
+    <h1>Producción No Convencional de Petróleo, Gas y Agua</h1>
+    <p>Análisis exploratorio de 426.090 registros mensuales de pozos no convencionales en Argentina. Un recorrido por la distribución, dispersión y forma de las tres variables principales de producción.</p>
+    <div class="hero-buttons">
+      <a class="btn btn-primary" href="https://github.com/VeronicaCeliz7/analisis-petroleo-no-convencional-YPF" target="_blank">Ver repositorio</a>
+      <a class="btn btn-outline" href="#petroleo">Ver análisis</a>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Petróleo</div>
+      <div class="stat-value">337,55</div>
+      <div class="stat-unit">m³ promedio por pozo</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Gas</div>
+      <div class="stat-value">630,11</div>
+      <div class="stat-unit">miles de m³ promedio</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Agua</div>
+      <div class="stat-value">190,99</div>
+      <div class="stat-unit">m³ promedio por pozo</div>
+    </div>
+  </section>
+
+  <section id="petroleo">
+    <div class="section-header">
+      <div class="section-eyebrow">Variable 1</div>
+      <h2 class="section-title">Producción de petróleo</h2>
+      <p class="section-desc">Distribución de <code>prod_pet</code> en 426.090 registros de producción mensual, con foco en la asimetría y presencia de valores atípicos.</p>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-card">{img_tag(pet['hist_todos'], 'Histograma de producción de petróleo')}</div>
+      <div class="chart-card">{img_tag(pet['hist_pos'], 'Histograma solo pozos positivos')}</div>
+      <div class="chart-card">{img_tag(pet['hist_log'], 'Histograma escala logarítmica')}</div>
+      <div class="chart-card">{img_tag(pet['box_sin'], 'Boxplot sin outliers')}</div>
+      <div class="chart-card">{img_tag(pet['box_con'], 'Boxplot con outliers')}</div>
+    </div>
+    <div class="measures">
+      <div class="measures-title">Medidas descriptivas</div>
+      <div class="measures-grid">
+        <div class="measure-item"><div class="measure-label">Media</div><div class="measure-value">337,55 <span class="measure-unit">m³</span></div></div>
+        <div class="measure-item"><div class="measure-label">Mediana</div><div class="measure-value">7,89 <span class="measure-unit">m³</span></div></div>
+        <div class="measure-item"><div class="measure-label">Desvío estándar</div><div class="measure-value">944,82 <span class="measure-unit">m³</span></div></div>
+        <div class="measure-item"><div class="measure-label">Q1 / Q3</div><div class="measure-value">0 / 125,78 <span class="measure-unit">m³</span></div></div>
+        <div class="measure-item"><div class="measure-label">Asimetría (skew)</div><div class="measure-value">4,92</div></div>
+        <div class="measure-item"><div class="measure-label">Curtosis</div><div class="measure-value">34,29</div></div>
+        <div class="measure-item"><div class="measure-label">Ceros</div><div class="measure-value">35,12<span class="measure-unit">%</span></div></div>
+        <div class="measure-item"><div class="measure-label">Máximo</div><div class="measure-value">26.593,26 <span class="measure-unit">m³</span></div></div>
+      </div>
+    </div>
+    <div class="interpretation">
+      <p>La producción de petróleo presenta un <strong>sesgo positivo extremo</strong> (skew = 4,92). La media (337,55 m³) es muy superior a la mediana (7,89 m³), lo que indica que la mayoría de los pozos producen poco y unos pocos concentran la mayor parte del volumen.</p>
+      <p>El 35,12% de los registros corresponden a pozos con producción nula. El primer cuartil (Q1) coincide con el mínimo en 0 m³, lo que significa que el 25% inferior de los pozos no produjo petróleo.</p>
+      <p>La <strong>curtosis de 34,29</strong> confirma la presencia de valores atípicos muy marcados. El máximo alcanza los 26.593,26 m³, muy por encima del tercer cuartil (125,78 m³). Este comportamiento es característico de la producción no convencional: alta variabilidad entre pozos, con unos pocos altamente productivos.</p>
+    </div>
+  </section>
+
+  <section id="gas">
+    <div class="section-header">
+      <div class="section-eyebrow">Variable 2</div>
+      <h2 class="section-title">Producción de gas</h2>
+      <p class="section-desc">Distribución de <code>prod_gas</code> en miles de m³. Se observa la misma estructura asimétrica que en petróleo, con mayor dispersión absoluta.</p>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-card">{img_tag(gas['hist'], 'Histograma de producción de gas')}</div>
+      <div class="chart-card">{img_tag(gas['hist_log'], 'Histograma de gas en escala logarítmica')}</div>
+      <div class="chart-card">{img_tag(gas['box'], 'Boxplot de producción de gas')}</div>
+    </div>
+    <div class="measures">
+      <div class="measures-title">Medidas descriptivas</div>
+      <div class="measures-grid">
+        <div class="measure-item"><div class="measure-label">Media</div><div class="measure-value">630,11 <span class="measure-unit">mil m³</span></div></div>
+        <div class="measure-item"><div class="measure-label">Mediana</div><div class="measure-value">103,33 <span class="measure-unit">mil m³</span></div></div>
+        <div class="measure-item"><div class="measure-label">Desvío estándar</div><div class="measure-value">1.633,62 <span class="measure-unit">mil m³</span></div></div>
+        <div class="measure-item"><div class="measure-label">Q1 / Q3</div><div class="measure-value">8,26 / 449,00 <span class="measure-unit">mil m³</span></div></div>
+        <div class="measure-item"><div class="measure-label">Asimetría (skew)</div><div class="measure-value">5,46</div></div>
+        <div class="measure-item"><div class="measure-label">Curtosis</div><div class="measure-value">40,62</div></div>
+        <div class="measure-item"><div class="measure-label">Ceros</div><div class="measure-value">20,56<span class="measure-unit">%</span></div></div>
+        <div class="measure-item"><div class="measure-label">Máximo</div><div class="measure-value">40.086,80 <span class="measure-unit">mil m³</span></div></div>
+      </div>
+    </div>
+    <div class="interpretation">
+      <p>La producción de gas presenta una <strong>asimetría positiva extrema</strong> (skew = 5,46), incluso más marcada que la del petróleo. La media (630,11 mil m³) supera ampliamente a la mediana (103,33 mil m³).</p>
+      <p>El primer cuartil (Q1) es de 8,26 mil m³, lo que indica que el 25% inferior de los pozos produce muy poco gas. Sin embargo, solo el 20,56% de los registros tienen producción exactamente nula, menor proporción que en petróleo.</p>
+      <p>La <strong>curtosis de 40,62</strong> indica colas extremadamente gruesas. El máximo alcanza los 40.086,80 mil m³, un valor muy alejado del tercer cuartil (449 mil m³). La distribución del gas combina un gran volumen de pozos de baja producción con unos pocos pozos de producción excepcionalmente alta.</p>
+    </div>
+  </section>
+
+  <section id="agua">
+    <div class="section-header">
+      <div class="section-eyebrow">Variable 3</div>
+      <h2 class="section-title">Producción de agua</h2>
+      <p class="section-desc">Distribución de <code>prod_agua</code>. La variable con mayor asimetría y curtosis de las tres, indicando la presencia de valores atípicos muy extremos.</p>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-card">{img_tag(agua['hist'], 'Histograma de producción de agua')}</div>
+      <div class="chart-card">{img_tag(agua['hist_log'], 'Histograma de agua en escala logarítmica')}</div>
+      <div class="chart-card">{img_tag(agua['box_sin'], 'Boxplot sin outliers')}</div>
+      <div class="chart-card">{img_tag(agua['box_con'], 'Boxplot con outliers')}</div>
+    </div>
+    <div class="measures">
+      <div class="measures-title">Medidas descriptivas</div>
+      <div class="measures-grid">
+        <div class="measure-item"><div class="measure-label">Media</div><div class="measure-value">190,99 <span class="measure-unit">m³</span></div></div>
+        <div class="measure-item"><div class="measure-label">Mediana</div><div class="measure-value">12,74 <span class="measure-unit">m³</span></div></div>
+        <div class="measure-item"><div class="measure-label">Desvío estándar</div><div class="measure-value">631,90 <span class="measure-unit">m³</span></div></div>
+        <div class="measure-item"><div class="measure-label">Q1 / Q3</div><div class="measure-value">0 / 87,36 <span class="measure-unit">m³</span></div></div>
+        <div class="measure-item"><div class="measure-label">Asimetría (skew)</div><div class="measure-value">7,87</div></div>
+        <div class="measure-item"><div class="measure-label">Curtosis</div><div class="measure-value">113,48</div></div>
+        <div class="measure-item"><div class="measure-label">Ceros</div><div class="measure-value">29,99<span class="measure-unit">%</span></div></div>
+        <div class="measure-item"><div class="measure-label">Máximo</div><div class="measure-value">34.792,95 <span class="measure-unit">m³</span></div></div>
+      </div>
+    </div>
+    <div class="interpretation">
+      <p>La producción de agua es la variable con <strong>mayor asimetría de las tres</strong> (skew = 7,87). La diferencia entre media (190,99 m³) y mediana (12,74 m³) es todavía más pronunciada que en petróleo y gas.</p>
+      <p>El primer cuartil (Q1) es 0 m³, lo que indica que el 25% inferior de los pozos no produce agua. Sin embargo, el 29,99% de los registros tienen producción nula, similar a lo observado en petróleo.</p>
+      <p>La <strong>curtosis de 113,48</strong> es notablemente más alta que las de petróleo (34,29) y gas (40,62). Esto significa que la distribución del agua tiene colas aún más gruesas y una mayor concentración de valores extremos. El máximo de 34.792,95 m³ refleja la presencia de pozos con producción de agua excepcionalmente alta, característica de los yacimientos no convencionales maduros donde el agua acompaña al petróleo extraído.</p>
+    </div>
+  </section>
+
+  <section id="comparacion">
+    <div class="section-header">
+      <div class="section-eyebrow">Síntesis</div>
+      <h2 class="section-title">Comparación entre las tres variables</h2>
+      <p class="section-desc">Las tres variables presentan una estructura de distribución similar, pero con diferencias claras en magnitud, dispersión y forma.</p>
+    </div>
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Medida</th>
+          <th>Petróleo (m³)</th>
+          <th>Gas (mil m³)</th>
+          <th>Agua (m³)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Media</td><td>337,55</td><td>630,11</td><td>190,99</td></tr>
+        <tr><td>Mediana</td><td>7,89</td><td>103,33</td><td>12,74</td></tr>
+        <tr><td>Desvío estándar</td><td>944,82</td><td>1.633,62</td><td>631,90</td></tr>
+        <tr><td>Q1</td><td>0</td><td>8,26</td><td>0</td></tr>
+        <tr><td>Q3</td><td>125,78</td><td>449,00</td><td>87,36</td></tr>
+        <tr><td>Asimetría (skew)</td><td>4,92</td><td>5,46</td><td><strong>7,87</strong></td></tr>
+        <tr><td>Curtosis</td><td>34,29</td><td>40,62</td><td><strong>113,48</strong></td></tr>
+        <tr><td>Porcentaje de ceros</td><td>35,12%</td><td>20,56%</td><td>29,99%</td></tr>
+        <tr><td>Máximo</td><td>26.593,26</td><td>40.086,80</td><td>34.792,95</td></tr>
+      </tbody>
+    </table>
+    <div class="interpretation">
+      <p>Las tres variables comparten la misma estructura: <strong>distribuciones fuertemente asimétricas, con muchos valores bajos o nulos y unos pocos valores extremadamente altos</strong>. Esta es la firma estadística de la producción no convencional.</p>
+      <p>El <strong>agua es la variable más asimétrica</strong> (skew = 7,87) y la de <strong>colas más gruesas</strong> (curtosis = 113,48). Esto sugiere que la producción de agua tiene una variabilidad más extrema que el petróleo y el gas, probablemente porque en pozos maduros la relación agua-petróleo aumenta significativamente.</p>
+      <p>El <strong>gas tiene la mayor producción promedio</strong> (630,11 mil m³), seguido por petróleo y agua. En todos los casos, la mediana es muy inferior a la media, lo que indica que la <strong>mediana es una medida más representativa del pozo típico</strong> que la media.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="conclusion">
+      <h3>Conclusiones del análisis</h3>
+      <p>La producción no convencional en Argentina presenta una distribución fuertemente desigual: la mayoría de los pozos producen poco, mientras unos pocos concentran la mayor parte del volumen extraído.</p>
+      <p>Este comportamiento tiene implicancias operativas y de negocio: la producción depende críticamente de un subconjunto pequeño de pozos altamente productivos, y cualquier análisis predictivo o económico debe considerar esta asimetría extrema.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="footer-content">
+    <div class="footer-name">Veronica Soledad Celiz</div>
+    <div class="footer-role">Analista de Sistemas · Análisis de datos</div>
+    <div class="footer-links">
+      <a href="mailto:veronicacelizanalista@gmail.com">veronicacelizanalista@gmail.com</a>
+      <a href="https://www.linkedin.com/in/veronica-soledad-celiz-4bba2032a/" target="_blank">LinkedIn</a>
+      <a href="https://github.com/VeronicaCeliz7/analisis-petroleo-no-convencional-YPF" target="_blank">GitHub</a>
+    </div>
+    <div class="footer-copy">
+      Análisis descriptivo · Datos abiertos de la Secretaría de Energía de la Nación
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>'''
+
