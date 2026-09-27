@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Análisis de Datos · Veronica Celiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ypf-blue: #003C71;
+  --ypf-light: #00A9E0;
+  --bg-soft: #F7F9FB;
+  --border: #E2E8F0;
+  --text: #0F172A;
+  --text-muted: #475569;
+  --text-soft: #94A3B8;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: white;
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+header {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 80px 24px 40px;
+  text-align: center;
+}
+.eyebrow {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--ypf-blue);
+  background: rgba(0,60,113,0.08);
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-bottom: 24px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+h1 {
+  font-size: 2.6rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  margin-bottom: 20px;
+}
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  max-width: 600px;
+  margin: 0 auto;
+}
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+.card {
+  display: block;
+  padding: 32px;
+  margin: 20px 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.card:hover {
+  border-color: var(--ypf-light);
+  transform: translateY(-2px);
+}
+.card-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ypf-light);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+.card h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ypf-blue);
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
+}
+.card p {
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+.card-meta {
+  margin-top: 16px;
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  color: var(--text-soft);
+}
+.card-meta strong {
+  color: var(--ypf-blue);
+  font-weight: 600;
+}
+footer {
+  background: var(--bg-soft);
+  border-top: 1px solid var(--border);
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--text-soft);
+  font-size: 0.85rem;
+}
+@media (max-width: 640px) {
+  h1 { font-size: 1.9rem; }
+  header { padding: 48px 24px 24px; }
+  .card { padding: 24px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Portfolio de análisis de datos</div>
+  <h1>Veronica Celiz</h1>
+  <p class="subtitle">Análisis exploratorios y descriptivos sobre producción energética y datos de Fórmula 1.</p>
+</header>
+
+<main>
+
+  <a class="card" href="petroleo.html">
+    <div class="card-tag">Energía</div>
+    <h2>Producción No Convencional · Vaca Muerta</h2>
+    <p>Análisis exploratorio de 426.090 registros mensuales de pozos no convencionales en Argentina. Distribución, dispersión y forma de las tres variables principales de producción.</p>
+    <div class="card-meta">
+      <span><strong>426.090</strong> registros</span>
+      <span>Petróleo · Gas · Agua</span>
+    </div>
+  </a>
+
+  <a class="card" href="degradacion.html">
+    <div class="card-tag">Fórmula 1</div>
+    <h2>Cumulative Degradation · Análisis de vueltas</h2>
+    <p>Análisis de 101.371 vueltas con foco en la masa real de la distribución, la identificación de vueltas anómalas y la lectura acumulada del tiempo ganado o perdido.</p>
+    <div class="card-meta">
+      <span><strong>101.371</strong> vueltas</span>
+      <span>Distribución · Outliers</span>
+    </div>
+  </a>
+
+  <a class="card" href="laptime.html">
+    <div class="card-tag">Fórmula 1</div>
+    <h2>LapTime · Tiempos de vuelta</h2>
+    <p>Análisis descriptivo de tiempos por vuelta con foco en la forma de la distribución, la dispersión de los datos y la detección de valores atípicos.</p>
+    <div class="card-meta">
+      <span><strong>101.371</strong> vueltas</span>
+      <span>Histogramas · Boxplot</span>
+    </div>
+  </a>
+
+</main>
+
+<footer>
+  © 2026 · Veronica Celiz · Análisis de datos
+</footer>
+
+</body>
+</html>
